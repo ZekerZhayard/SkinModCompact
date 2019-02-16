@@ -1,0 +1,16 @@
+[
+{
+  "modid": "skinmodcompact",
+  "name": "SkinModCompact",
+  "description": "Compact CustomSkinLoacer and NeteaseSkinMod.",
+  "version": "${version}",
+  "mcversion": "[1.8,1.12.2]",
+  "url": "https://github.com/ZekerZhayard/SkinModCompact",
+  "updateUrl": "https://raw.githubusercontent.com/ZekerZhayard/SkinModCompact/master/update.json",
+  "authorList": ["ZekerZhayard"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
