@@ -9,12 +9,12 @@ import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRema
 
 public class SkinManagerVisitor extends ClassVisitor {
     private String className;
-    
+
     public SkinManagerVisitor(int api, ClassVisitor cv, String className) {
         super(api, cv);
         this.className = className;
     }
-    
+
     @Override()
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
@@ -32,8 +32,8 @@ public class SkinManagerVisitor extends ClassVisitor {
                 }
             };
         } else if (FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(this.className, name, desc).equals("func_152790_a") && FMLDeobfuscatingRemapper.INSTANCE.mapMethodDesc(desc).equals("(Lcom/mojang/authlib/GameProfile;Lnet/minecraft/client/resources/SkinManager$SkinAvailableCallback;Z)V")) {
-        	ClassTransformer.logger.debug("Found the method: " + name + desc);
-        	return new MethodVisitor(this.api, mv) {
+            ClassTransformer.logger.debug("Found the method: " + name + desc);
+            return new MethodVisitor(this.api, mv) {
                 @Override()
                 public void visitCode() {
                     super.visitCode();
@@ -42,7 +42,7 @@ public class SkinManagerVisitor extends ClassVisitor {
                     super.visitMethodInsn(Opcodes.INVOKESTATIC, "SkinModCompactByteCodeHook", "loadProfileTextures", "(Lcom/mojang/authlib/GameProfile;Lnet/minecraft/client/resources/SkinManager$SkinAvailableCallback;)V", false);
                     super.visitInsn(Opcodes.RETURN);
                 }
-        	};
+            };
         }
         return mv;
     }

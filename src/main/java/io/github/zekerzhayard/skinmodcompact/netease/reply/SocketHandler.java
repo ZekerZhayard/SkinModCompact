@@ -10,12 +10,12 @@ import io.github.zekerzhayard.skinmodcompact.netease.NeteaseAPILoader;
 public class SocketHandler extends Reply {
     public static final int SMID = 1;
     private MessageReply oldReply;
-    
+
     public SocketHandler(MessageReply oldReply) {
         super();
         this.oldReply = oldReply;
     }
-    
+
     public void handler() {
         NeteaseAPILoader.socketClosed = true;
         try {

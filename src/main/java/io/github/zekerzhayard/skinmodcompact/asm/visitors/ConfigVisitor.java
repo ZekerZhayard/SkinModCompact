@@ -10,7 +10,7 @@ public class ConfigVisitor extends ClassVisitor {
     public ConfigVisitor(int api, ClassVisitor cv, String className) {
         super(api, cv);
     }
-    
+
     @Override()
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);

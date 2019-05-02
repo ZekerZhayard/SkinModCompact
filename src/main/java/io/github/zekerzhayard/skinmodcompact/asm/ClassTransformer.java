@@ -17,15 +17,15 @@ import io.github.zekerzhayard.skinmodcompact.asm.visitors.SkinManagerVisitor;
 import net.minecraft.launchwrapper.IClassTransformer;
 
 public class ClassTransformer implements IClassTransformer {
-	public static Logger logger = LogManager.getLogger(SkinModCompact.NAME);
-	
+    public static Logger logger = LogManager.getLogger(SkinModCompact.NAME);
+
     private ImmutableMap<String, Class<? extends ClassVisitor>> visitors = ImmutableMap.of(
             "customskinloader.config.Config", ConfigVisitor.class,
             "customskinloader.CustomSkinLoader", CustomSkinLoaderVisitor.class,
             "customskinloader.loader.ProfileLoader", ProfileLoaderVisitor.class,
             "net.minecraft.client.resources.SkinManager", SkinManagerVisitor.class
     );
-    
+
     @Override()
     public byte[] transform(String name, String transformedName, byte[] basicClass) {
         if (this.visitors.containsKey(transformedName)) {
