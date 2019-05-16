@@ -15,6 +15,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.netease.mc.mod.network.common.GameState;
 import com.netease.mc.mod.network.message.request.MessageRequest;
+import com.netease.mc.mod.network.socket.NetworkHandler;
 
 import customskinloader.CustomSkinLoader;
 import customskinloader.config.SkinSiteProfile;
@@ -24,6 +25,7 @@ import customskinloader.profile.UserProfile;
 import customskinloader.utils.HttpTextureUtil;
 import io.github.zekerzhayard.skinmodcompact.netease.reply.LoadSkinReply;
 import io.github.zekerzhayard.skinmodcompact.netease.reply.LoadSkinReplyV2;
+import io.github.zekerzhayard.skinmodcompact.netease.reply.SocketHandler;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class NeteaseAPILoader implements ProfileLoader.IProfileLoader {
@@ -32,6 +34,12 @@ public class NeteaseAPILoader implements ProfileLoader.IProfileLoader {
     public static ConcurrentHashMap<String, String> nameSkinMap = new ConcurrentHashMap<>();
     public static ConcurrentHashMap<String, String> nameCapeMap = new ConcurrentHashMap<>();
     public static ConcurrentHashMap<String, Boolean> nameSkinMode = new ConcurrentHashMap<>();
+    
+    static {
+        NetworkHandler.replyHashMap.put(SocketHandler.SMID, new SocketHandler(NetworkHandler.replyHashMap.get(SocketHandler.SMID)));
+        NetworkHandler.replyAsyncHashMap.put(LoadSkinReply.SMID, new LoadSkinReply());
+        NetworkHandler.replyAsyncHashMap.put(LoadSkinReplyV2.SMID, new LoadSkinReplyV2());
+    }
 
     @Override()
     public UserProfile loadProfile(SkinSiteProfile ssp, GameProfile gameProfile) throws Exception {

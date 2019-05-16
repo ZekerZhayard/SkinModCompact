@@ -21,7 +21,7 @@ public class ProfileLoaderVisitor extends ClassVisitor {
                 public void visitInsn(int opcode) {
                     if (opcode == Opcodes.ARETURN) {
                         ClassTransformer.logger.debug("Found the node: {}", opcode);
-                        super.visitMethodInsn(Opcodes.INVOKESTATIC, "SkinModCompactByteCodeHook", "addNeteaseAPI", "(Ljava/util/HashMap;)Ljava/util/HashMap;", false);
+                        super.visitMethodInsn(Opcodes.INVOKESTATIC, "SkinModCompactByteCodeHook", "loadPlugins", "(Ljava/util/HashMap;)Ljava/util/HashMap;", false);
                     }
                     super.visitInsn(opcode);
                 }
