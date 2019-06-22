@@ -14,6 +14,7 @@ import io.github.zekerzhayard.skinmodcompact.asm.visitors.ConfigVisitor;
 import io.github.zekerzhayard.skinmodcompact.asm.visitors.CustomSkinLoaderVisitor;
 import io.github.zekerzhayard.skinmodcompact.asm.visitors.ProfileLoaderVisitor;
 import io.github.zekerzhayard.skinmodcompact.asm.visitors.SkinManagerVisitor;
+import io.github.zekerzhayard.skinmodcompact.asm.visitors.ThreadDownloadImageData_1Visitor;
 import net.minecraft.launchwrapper.IClassTransformer;
 
 public class ClassTransformer implements IClassTransformer {
@@ -23,6 +24,7 @@ public class ClassTransformer implements IClassTransformer {
             "customskinloader.config.Config", ConfigVisitor.class,
             "customskinloader.CustomSkinLoader", CustomSkinLoaderVisitor.class,
             "customskinloader.loader.ProfileLoader", ProfileLoaderVisitor.class,
+            "net.minecraft.client.renderer.ThreadDownloadImageData$1", ThreadDownloadImageData_1Visitor.class,
             "net.minecraft.client.resources.SkinManager", SkinManagerVisitor.class
     );
 

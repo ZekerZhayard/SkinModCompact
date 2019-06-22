@@ -7,16 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.netease.mc.mod.network.common.GameState;
 import com.netease.mc.mod.network.message.request.MessageRequest;
 import com.netease.mc.mod.network.socket.NetworkHandler;
-
 import customskinloader.CustomSkinLoader;
 import customskinloader.config.SkinSiteProfile;
 import customskinloader.loader.ProfileLoader;
@@ -26,7 +21,10 @@ import customskinloader.utils.HttpTextureUtil;
 import io.github.zekerzhayard.skinmodcompact.netease.reply.LoadSkinReply;
 import io.github.zekerzhayard.skinmodcompact.netease.reply.LoadSkinReplyV2;
 import io.github.zekerzhayard.skinmodcompact.netease.reply.SocketHandler;
-import net.minecraft.entity.player.EntityPlayer;
+import io.github.zekerzhayard.skinmodcompact.utils.MinecraftUtils;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class NeteaseAPILoader implements ProfileLoader.IProfileLoader {
     public static boolean socketClosed = false;
@@ -53,7 +51,7 @@ public class NeteaseAPILoader implements ProfileLoader.IProfileLoader {
         MessageRequest mrq = new MessageRequest();
         CustomSkinLoader.logger.info("Skin: send message to launcher.");
         mrq.send(LoadSkinReply.SMID, GameState.gameid, name);
-        mrq.send(LoadSkinReplyV2.SMID, GameState.gameid, name, EntityPlayer.getUUID(gameProfile).toString());
+        mrq.send(LoadSkinReplyV2.SMID, GameState.gameid, name, MinecraftUtils.getPlayerUUID(gameProfile));
         synchronized (NeteaseAPILoader.lockObjectMap.get(name)) {
             try {
                 NeteaseAPILoader.lockObjectMap.get(name).wait(10000L);

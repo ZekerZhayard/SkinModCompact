@@ -6,12 +6,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.commons.lang3.reflect.FieldUtils;
-
-import com.google.common.base.Strings;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
-
 import customskinloader.CustomSkinLoader;
 import customskinloader.Logger;
 import customskinloader.config.SkinSiteProfile;
@@ -21,12 +17,14 @@ import customskinloader.profile.UserProfile;
 import customskinloader.utils.HttpRequestUtil;
 import customskinloader.utils.HttpTextureUtil;
 import io.github.zekerzhayard.skinmodcompact.utils.FilesUtils;
+import io.github.zekerzhayard.skinmodcompact.utils.MinecraftUtils;
 import io.github.zekerzhayard.skinmodcompact.utils.UserProfileUtils;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.SkinManager;
+import org.apache.commons.lang3.reflect.FieldUtils;
 
 public class SkinModCompactByteCodeHook {
     private static ConcurrentHashMap<GameProfile, SkinManager.SkinAvailableCallback> callBackMap = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<Integer, ExecutorService> loaderThreadPool = new ConcurrentHashMap<>();
     private static ConcurrentHashMap<String, ReentrantLock> lockMap = new ConcurrentHashMap<>();
     private static ExecutorService threadPool = Executors.newCachedThreadPool();
     
@@ -42,7 +40,7 @@ public class SkinModCompactByteCodeHook {
                     SkinModCompactByteCodeHook.lockMap.get(gameProfile.getName()).lock();
                     Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = new HashMap<>();
                     map.putAll(CustomSkinLoader.loadProfile(gameProfile));
-                    Minecraft.getMinecraft().addScheduledTask(new SkinModCompactByteCodeHook.LoadSkinRunnable(gameProfile, map));
+                    MinecraftUtils.addScheduledTask(new SkinModCompactByteCodeHook.LoadSkinRunnable(gameProfile, map));
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -50,6 +48,14 @@ public class SkinModCompactByteCodeHook {
                 }
             }
         });
+    }
+    
+    public static String retryToDownload(String msg, Thread thread) {
+        if (msg != null && msg.contains("timed out")) {
+            CustomSkinLoader.logger.info("[SkinModCompact] Retry to download Image. (" + thread.getName() + ")");
+            thread.run();
+        }
+        return msg;
     }
 
     public static boolean cleanDirectory(boolean b) throws IllegalAccessException {
@@ -87,10 +93,21 @@ public class SkinModCompactByteCodeHook {
                 CustomSkinLoader.logger.info((i + j + 1) + "/" + CustomSkinLoader.config.loadlist.size() + " Try to load profile from '" + ssp.name + "'.");
                 final ProfileLoader.IProfileLoader loader = ProfileLoader.LOADERS.get(ssp.type.toLowerCase());
                 final int loaderPriority = k - i;
-                SkinModCompactByteCodeHook.threadPool.execute(new Runnable() {
+                
+                if (SkinModCompactByteCodeHook.loaderThreadPool.get(i + j) == null) {
+                    synchronized (SkinModCompactByteCodeHook.loaderThreadPool) {
+                        if (SkinModCompactByteCodeHook.loaderThreadPool.get(i + j) == null) {
+                            SkinModCompactByteCodeHook.loaderThreadPool.put(i + j, Executors.newSingleThreadExecutor());
+                        }
+                    }
+                }
+
+                SkinModCompactByteCodeHook.loaderThreadPool.get(i + j).execute(new Runnable() {
                     @Override()
                     public void run() {
                         Thread.currentThread().setName(threadName);
+                        boolean isSkull = threadName.equals(gameProfile.getName() + "'s skull");
+                        
                         UserProfile profile = null;
                         if (loader != null) {
                             try {
@@ -107,16 +124,16 @@ public class SkinModCompactByteCodeHook {
                             CustomSkinLoader.logger.info("Type '" + ssp.type + "' is not defined.");
                         }
                         synchronized (userProfile) {
-                            String oldUrl = Strings.nullToEmpty(userProfile.skinUrl);
+                            UserProfile oldProfile = UserProfileUtils.clone(userProfile);
                             UserProfileUtils.mix(userProfile, profile, indicators, loaderPriority);
                             indicators[0] = indicators[0] | 1L << loaderPriority - 1;
-                            boolean isSkull = threadName.equals(gameProfile.getName() + "'s skull");
-                            if (!isSkull && userProfile.hasSkinUrl() && !oldUrl.equals(userProfile.skinUrl)) {
-                                Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = ModelManager0.fromUserProfile(profile);
+                            
+                            if (!isSkull && !UserProfileUtils.isEquals(oldProfile, userProfile)) {
+                                Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = ModelManager0.fromUserProfile(userProfile);
                                 if (!CustomSkinLoader.config.enableCape) {
                                     map.remove(MinecraftProfileTexture.Type.CAPE);
                                 }
-                                Minecraft.getMinecraft().addScheduledTask(new SkinModCompactByteCodeHook.LoadSkinRunnable(gameProfile, map));
+                                MinecraftUtils.addScheduledTask(new SkinModCompactByteCodeHook.LoadSkinRunnable(gameProfile, map));
                             }
                             if (isSkull && UserProfileUtils.isEffective(false, indicators) || indicators[0] == -1L >>> 64 - k || UserProfileUtils.isEffective(CustomSkinLoader.config.forceLoadAllTextures, indicators)) {
                                 synchronized (lock) {
@@ -177,7 +194,7 @@ public class SkinModCompactByteCodeHook {
         @Override()
         public void run() {
             for (Map.Entry<MinecraftProfileTexture.Type, MinecraftProfileTexture> entry : this.map.entrySet()) {
-                Minecraft.getMinecraft().getSkinManager().loadSkin(entry.getValue(), entry.getKey(), SkinModCompactByteCodeHook.callBackMap.get(this.gameProfile));
+                MinecraftUtils.loadSkin(entry.getValue(), entry.getKey(), SkinModCompactByteCodeHook.callBackMap.get(this.gameProfile));
             }
         }
     }

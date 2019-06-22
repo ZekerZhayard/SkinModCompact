@@ -1,8 +1,10 @@
 package io.github.zekerzhayard.skinmodcompact.utils;
 
-import org.apache.commons.lang3.StringUtils;
+import java.lang.reflect.Field;
 
+import com.google.common.base.Strings;
 import customskinloader.profile.UserProfile;
+import org.apache.commons.lang3.StringUtils;
 
 public class UserProfileUtils {
     public static void mix(UserProfile mixedProfile, UserProfile profile, long[] indicators, int priority) {
@@ -34,5 +36,32 @@ public class UserProfileUtils {
     public static boolean isEffective(boolean forceLoadAllTextures, long[] indicators) {
         return (forceLoadAllTextures && (indicators[0] | indicators[1]) == indicators[0] && (indicators[0] | indicators[2]) == indicators[0])
             ||(!forceLoadAllTextures && (indicators[0] | indicators[1]) == indicators[0] || (indicators[0] | indicators[2]) == indicators[0]);
+    }
+    
+    public static UserProfile clone(UserProfile oldProfile) {
+        UserProfile newProfile = new UserProfile();
+        for (Field field : UserProfile.class.getFields()) {
+            try {
+                field.set(newProfile, field.get(oldProfile));
+            } catch (IllegalArgumentException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return newProfile;
+    }
+    
+    public static boolean isEquals(UserProfile profile1, UserProfile profile2) {
+        for (Field field : UserProfile.class.getFields()) {
+            boolean isEquals = false;
+            try {
+                isEquals = Strings.nullToEmpty((String) field.get(profile1)).equals(Strings.nullToEmpty((String) field.get(profile2)));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (!isEquals) {
+                return false;
+            }
+        }
+        return true;
     }
 }
