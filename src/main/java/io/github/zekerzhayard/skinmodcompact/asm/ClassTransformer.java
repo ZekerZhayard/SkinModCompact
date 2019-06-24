@@ -1,43 +1,27 @@
 package io.github.zekerzhayard.skinmodcompact.asm;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
+import java.util.ServiceLoader;
 
-import com.google.common.collect.ImmutableMap;
-
-import io.github.zekerzhayard.skinmodcompact.SkinModCompact;
-import io.github.zekerzhayard.skinmodcompact.asm.visitors.ConfigVisitor;
-import io.github.zekerzhayard.skinmodcompact.asm.visitors.CustomSkinLoaderVisitor;
-import io.github.zekerzhayard.skinmodcompact.asm.visitors.ProfileLoaderVisitor;
-import io.github.zekerzhayard.skinmodcompact.asm.visitors.SkinManagerVisitor;
-import io.github.zekerzhayard.skinmodcompact.asm.visitors.ThreadDownloadImageData_1Visitor;
+import io.github.zekerzhayard.skinmodcompact.asm.transformers.AbstractClassTransformer;
 import net.minecraft.launchwrapper.IClassTransformer;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.tree.ClassNode;
 
 public class ClassTransformer implements IClassTransformer {
-    public static Logger logger = LogManager.getLogger(SkinModCompact.NAME);
-
-    private ImmutableMap<String, Class<? extends ClassVisitor>> visitors = ImmutableMap.of(
-            "customskinloader.config.Config", ConfigVisitor.class,
-            "customskinloader.CustomSkinLoader", CustomSkinLoaderVisitor.class,
-            "customskinloader.loader.ProfileLoader", ProfileLoaderVisitor.class,
-            "net.minecraft.client.renderer.ThreadDownloadImageData$1", ThreadDownloadImageData_1Visitor.class,
-            "net.minecraft.client.resources.SkinManager", SkinManagerVisitor.class
-    );
+    private ServiceLoader<AbstractClassTransformer> sl = ServiceLoader.load(AbstractClassTransformer.class);
 
     @Override()
-    public byte[] transform(String name, String transformedName, byte[] basicClass) {
-        if (this.visitors.containsKey(transformedName)) {
-            ClassTransformer.logger.debug("Found the class: " + transformedName);
-            ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-            try {
-                new ClassReader(basicClass).accept(this.visitors.get(transformedName).getConstructor(int.class, ClassVisitor.class, String.class).newInstance(Opcodes.ASM5, cw, name), ClassReader.EXPAND_FRAMES);
+    public byte[] transform(String className, String transformedName, byte[] basicClass) {
+        for (AbstractClassTransformer act : this.sl) {
+            if (act.isTargetClassName(transformedName)) {
+                System.out.println("Found the class: " + className);
+                ClassNode cn = new ClassNode();
+                new ClassReader(basicClass).accept(cn, 0);
+                act.transform(cn);
+                ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+                cn.accept(cw);
                 return cw.toByteArray();
-            } catch (Exception e) {
-                ClassTransformer.logger.warn("", e);
             }
         }
         return basicClass;

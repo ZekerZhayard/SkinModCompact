@@ -9,7 +9,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import customskinloader.CustomSkinLoader;
-import customskinloader.Logger;
 import customskinloader.config.SkinSiteProfile;
 import customskinloader.loader.ProfileLoader;
 import customskinloader.profile.ModelManager0;
@@ -20,7 +19,7 @@ import io.github.zekerzhayard.skinmodcompact.utils.FilesUtils;
 import io.github.zekerzhayard.skinmodcompact.utils.MinecraftUtils;
 import io.github.zekerzhayard.skinmodcompact.utils.UserProfileUtils;
 import net.minecraft.client.resources.SkinManager;
-import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.logging.log4j.Logger;
 
 public class SkinModCompactByteCodeHook {
     private static ConcurrentHashMap<GameProfile, SkinManager.SkinAvailableCallback> callBackMap = new ConcurrentHashMap<>();
@@ -50,25 +49,26 @@ public class SkinModCompactByteCodeHook {
         });
     }
     
-    public static String retryToDownload(String msg, Thread thread) {
+    public static void retryToDownload(Logger logger, String msg, Thread thread) {
+        logger.error(msg);
         if (msg != null && msg.contains("timed out")) {
-            CustomSkinLoader.logger.info("[SkinModCompact] Retry to download Image. (" + thread.getName() + ")");
+            logger.info("[SkinModCompact] Retry to download image.");
             thread.run();
         }
-        return msg;
     }
 
-    public static boolean cleanDirectory(boolean b) throws IllegalAccessException {
-        FieldUtils.writeDeclaredField(Logger.Level.DEBUG, "display", true, true);
-        new Thread() {
-            @Override()
-            public void run() {
-                long timeStamp = System.currentTimeMillis();
-                FilesUtils.cleanDirectory(HttpRequestUtil.CACHE_DIR, timeStamp);
-                FilesUtils.cleanDirectory(HttpTextureUtil.getCacheDir(), timeStamp);
-                CustomSkinLoader.logger.info("Cleaning cache complete.");
-            }
-        }.start();
+    public static boolean cleanDirectory(boolean enableLocalProfileCache) {
+        if (!enableLocalProfileCache) {
+            new Thread() {
+                @Override()
+                public void run() {
+                    long timeStamp = System.currentTimeMillis();
+                    FilesUtils.cleanDirectory(HttpRequestUtil.CACHE_DIR, timeStamp);
+                    FilesUtils.cleanDirectory(HttpTextureUtil.getCacheDir(), timeStamp);
+                    CustomSkinLoader.logger.info("Cleaning cache complete.");
+                }
+            }.start();
+        }
         return true;
     }
     
