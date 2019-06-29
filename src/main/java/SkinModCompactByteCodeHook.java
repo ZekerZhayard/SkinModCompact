@@ -1,9 +1,15 @@
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.mojang.authlib.GameProfile;
@@ -23,7 +29,8 @@ import org.apache.logging.log4j.Logger;
 
 public class SkinModCompactByteCodeHook {
     private static ConcurrentHashMap<GameProfile, SkinManager.SkinAvailableCallback> callBackMap = new ConcurrentHashMap<>();
-    private static ConcurrentHashMap<Integer, ExecutorService> loaderThreadPool = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<Integer, ThreadPoolExecutor> loaderThreadPools = new ConcurrentHashMap<>();
+//    private static ConcurrentHashMap<Integer, ConcurrentLinkedDeque<Runnable>> loadProfileRunnables = new ConcurrentHashMap<>();
     private static ConcurrentHashMap<String, ReentrantLock> lockMap = new ConcurrentHashMap<>();
     private static ExecutorService threadPool = Executors.newCachedThreadPool();
     
@@ -51,10 +58,8 @@ public class SkinModCompactByteCodeHook {
     
     public static void retryToDownload(Logger logger, String msg, Thread thread) {
         logger.error(msg);
-        if (msg != null && msg.contains("timed out")) {
-            logger.info("[SkinModCompact] Retry to download image.");
-            thread.run();
-        }
+        logger.info("[SkinModCompact] Retry to download image.");
+        thread.run();
     }
 
     public static boolean cleanDirectory(boolean enableLocalProfileCache) {
@@ -72,15 +77,6 @@ public class SkinModCompactByteCodeHook {
         return true;
     }
     
-    public static HashMap<String, ProfileLoader.IProfileLoader> loadPlugins(HashMap<String, ProfileLoader.IProfileLoader> loaders) {
-        ServiceLoader<ProfileLoader.IProfileLoader> sl = ServiceLoader.load(ProfileLoader.IProfileLoader.class, SkinModCompactByteCodeHook.class.getClassLoader());
-        for (ProfileLoader.IProfileLoader profileLoader : sl) {
-            loaders.put(profileLoader.getName().toLowerCase(), profileLoader);
-            CustomSkinLoader.logger.info("Add profile loader: " + profileLoader.getName());
-        }
-        return loaders;
-    }
-    
     public static UserProfile loadProfile(final UserProfile userProfile, final GameProfile gameProfile) {
         for (int j = 0; j <= CustomSkinLoader.config.loadlist.size(); j += 64) {
             final int k = Math.min(CustomSkinLoader.config.loadlist.size() - j, 64);
@@ -94,15 +90,18 @@ public class SkinModCompactByteCodeHook {
                 final ProfileLoader.IProfileLoader loader = ProfileLoader.LOADERS.get(ssp.type.toLowerCase());
                 final int loaderPriority = k - i;
                 
-                if (SkinModCompactByteCodeHook.loaderThreadPool.get(i + j) == null) {
-                    synchronized (SkinModCompactByteCodeHook.loaderThreadPool) {
-                        if (SkinModCompactByteCodeHook.loaderThreadPool.get(i + j) == null) {
-                            SkinModCompactByteCodeHook.loaderThreadPool.put(i + j, Executors.newSingleThreadExecutor());
+                if (SkinModCompactByteCodeHook.loaderThreadPools.get(i + j) == null) {
+                    synchronized (SkinModCompactByteCodeHook.loaderThreadPools) {
+                        if (SkinModCompactByteCodeHook.loaderThreadPools.get(i + j) == null) {
+//                            SkinModCompactByteCodeHook.loadProfileRunnables.put(i + j, new ConcurrentLinkedDeque<Runnable>());
+                            SkinModCompactByteCodeHook.loaderThreadPools.put(i + j, new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>()));
                         }
                     }
                 }
-
-                SkinModCompactByteCodeHook.loaderThreadPool.get(i + j).execute(new Runnable() {
+                
+                final ThreadPoolExecutor loaderThreadPool = SkinModCompactByteCodeHook.loaderThreadPools.get(i + j);
+//                final ConcurrentLinkedDeque<Runnable> loadProfileRunnables = SkinModCompactByteCodeHook.loadProfileRunnables.get(i + j);
+                Runnable loadProfileRunnable = new Runnable() {
                     @Override()
                     public void run() {
                         Thread.currentThread().setName(threadName);
@@ -141,12 +140,25 @@ public class SkinModCompactByteCodeHook {
                                 }
                             }
                         }
+//                        synchronized (loadProfileRunnables) {
+//                            if (!loadProfileRunnables.isEmpty()) {
+//                                loaderThreadPool.execute(loadProfileRunnables.getFirst());
+//                                loadProfileRunnables.removeFirst();
+//                            }
+//                        }
                     }
-                });
+                };
+//                synchronized (loadProfileRunnables) {
+//                    if (loaderThreadPool.getQueue().isEmpty()) {
+                        loaderThreadPool.execute(loadProfileRunnable);
+//                    } else {
+//                        loadProfileRunnables.addFirst(loadProfileRunnable);
+//                    }
+//                }
             }
             synchronized (lock) {
                 try {
-                    lock.wait(1000 * 11);
+                    lock.wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -182,7 +194,12 @@ public class SkinModCompactByteCodeHook {
         });
     }
     
-    public static class LoadSkinRunnable implements Runnable {
+    public static String encodeURL(String str) throws MalformedURLException, URISyntaxException {
+        URL url = new URL(str);
+        return new URI(url.getProtocol(), url.getHost(), url.getPath(), url.getQuery(), null).toString();
+    }
+    
+    private static class LoadSkinRunnable implements Runnable {
         private GameProfile gameProfile;
         private Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map;
 
