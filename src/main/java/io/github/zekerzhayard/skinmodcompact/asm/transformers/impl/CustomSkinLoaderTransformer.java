@@ -57,6 +57,21 @@ public class CustomSkinLoaderTransformer extends AbstractClassTransformer {
                                     public void transform(MethodNode mn, AbstractInsnNode ain) {
                                         mn.instructions.insertBefore(ain, new MethodInsnNode(Opcodes.INVOKESTATIC, "SkinModCompactByteCodeHook", "jump", "(I)I", false));
                                     }
+                                }, new AbstractInsnTransformer() {
+                                    @Override
+                                    public boolean isTargetInsn(AbstractInsnNode ain) {
+                                        if (ain instanceof MethodInsnNode) {
+                                            MethodInsnNode min = (MethodInsnNode) ain;
+                                            return min.getOpcode() == Opcodes.INVOKEVIRTUAL && min.owner.equals("customskinloader/profile/UserProfile") && min.name.equals("mix") && min.desc.equals("(Lcustomskinloader/profile/UserProfile;)V");
+                                        }
+                                        return false;
+                                    }
+                                    
+                                    @Override
+                                    public void transform(MethodNode mn, AbstractInsnNode ain) {
+                                        mn.instructions.insertBefore(ain, new VarInsnNode(Opcodes.ALOAD, 0));
+                                        mn.instructions.set(ain, new MethodInsnNode(Opcodes.INVOKESTATIC, "SkinModCompactByteCodeHook", "mix", "(Lcustomskinloader/profile/UserProfile;Lcustomskinloader/profile/UserProfile;Lcom/mojang/authlib/GameProfile;)V", false));
+                                    }
                                 }
                         };
                     }
