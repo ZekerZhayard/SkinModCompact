@@ -1,5 +1,6 @@
 io.github.zekerzhayard.skinmodcompact.asm.transformers.impl.ConfigTransformer
 io.github.zekerzhayard.skinmodcompact.asm.transformers.impl.CustomSkinLoaderTransformer
+io.github.zekerzhayard.skinmodcompact.asm.transformers.impl.ForgeModTransformer
 io.github.zekerzhayard.skinmodcompact.asm.transformers.impl.HttpRequestUtilTransformer
 io.github.zekerzhayard.skinmodcompact.asm.transformers.impl.SkinManagerTransformer
-io.github.zekerzhayard.skinmodcompact.asm.transformers.impl.ThreadDownloadImageData_1Transformer
+io.github.zekerzhayard.skinmodcompact.asm.transformers.impl.ThreadDownloadImageDataTransformer

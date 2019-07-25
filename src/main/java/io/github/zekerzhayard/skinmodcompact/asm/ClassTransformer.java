@@ -15,11 +15,11 @@ public class ClassTransformer implements IClassTransformer {
     public byte[] transform(String className, String transformedName, byte[] basicClass) {
         for (AbstractClassTransformer act : this.sl) {
             if (act.isTargetClassName(transformedName)) {
-                System.out.println("Found the class: " + className);
+                System.out.println("Found the class: " + className + " -> " + transformedName);
                 ClassNode cn = new ClassNode();
-                new ClassReader(basicClass).accept(cn, 0);
+                new ClassReader(basicClass).accept(cn, ClassReader.EXPAND_FRAMES);
                 act.transform(cn);
-                ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+                ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
                 cn.accept(cw);
                 return cw.toByteArray();
             }

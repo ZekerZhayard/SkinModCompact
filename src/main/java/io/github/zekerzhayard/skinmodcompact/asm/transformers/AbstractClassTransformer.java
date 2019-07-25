@@ -14,8 +14,10 @@ public abstract class AbstractClassTransformer {
     public void transform(ClassNode cn) {
         for (MethodNode mn : cn.methods) {
             for (AbstractMethodTransformer amt : this.methodTransformers) {
-                if (amt.isTargetMethod(FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(cn.name, mn.name, mn.desc), FMLDeobfuscatingRemapper.INSTANCE.mapMethodDesc(mn.desc))) {
-                    System.out.println("Found the method: " + mn.name + mn.desc);
+                String mappedMethodName = FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(cn.name, mn.name, mn.desc);
+                String mappedMethodDesc = FMLDeobfuscatingRemapper.INSTANCE.mapMethodDesc(mn.desc);
+                if (amt.isTargetMethod(mappedMethodName, mappedMethodDesc)) {
+                    System.out.println("Found the method: " + mn.name + mn.desc + " -> " + mappedMethodName + mappedMethodDesc);
                     amt.transform(mn);
                 }
             }

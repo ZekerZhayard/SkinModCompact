@@ -27,8 +27,6 @@ import io.github.zekerzhayard.skinmodcompact.utils.FilesUtils;
 import io.github.zekerzhayard.skinmodcompact.utils.MinecraftUtils;
 import io.github.zekerzhayard.skinmodcompact.utils.UserProfileUtils;
 import net.minecraft.client.resources.SkinManager;
-import net.minecraft.client.resources.SkinManager.SkinAvailableCallback;
-import org.apache.logging.log4j.Logger;
 
 public class SkinModCompactByteCodeHook {
     private static ConcurrentHashMap<String, SkinManager.SkinAvailableCallback> callBackMap = new ConcurrentHashMap<>();
@@ -61,15 +59,6 @@ public class SkinModCompactByteCodeHook {
                 }
             }
         });
-    }
-    
-    public static void retryToDownload(Logger logger, String msg, Thread thread) throws InterruptedException {
-        logger.error(msg);
-        if (msg.contains("java.net.UnknownHostException")) {
-            Thread.sleep(1000L);
-        }
-        logger.info("[SkinModCompact] Retry to download image.");
-        thread.run();
     }
 
     public static boolean cleanDirectory(boolean enableLocalProfileCache) {
@@ -235,7 +224,7 @@ public class SkinModCompactByteCodeHook {
         
         @Override()
         public void run() {
-            SkinAvailableCallback skinAvailableCallback = SkinModCompactByteCodeHook.callBackMap.get(this.gameProfile.getProperties().get("skinAvailableCallback").iterator().next().getValue());
+            SkinManager.SkinAvailableCallback skinAvailableCallback = SkinModCompactByteCodeHook.callBackMap.get(this.gameProfile.getProperties().get("skinAvailableCallback").iterator().next().getValue());
             for (Map.Entry<MinecraftProfileTexture.Type, MinecraftProfileTexture> entry : this.map.entrySet()) {
                 MinecraftUtils.loadSkin(entry.getValue(), entry.getKey(), skinAvailableCallback);
             }
