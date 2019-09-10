@@ -20,9 +20,9 @@ plugins {
     id "net.minecraftforge.gradle.forge" version "2.0.2"
 }
 */
-version = "4.9"
-group= "com.yourname.modid" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "SkinModCompact-ST"
+version = "5.0-RC-" + System.getenv("TRAVIS_BUILD_NUMBER")
+group = "io.github.zekerzhayard" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "SkinModCompact-ST-CSL-14.11-r"
 
 sourceCompatibility = targetCompatibility = '1.7' // Need this here so eclipse task generates correctly.
 compileJava {
@@ -71,8 +71,7 @@ dependencies {
 
 }
 
-processResources
-{
+processResources {
     // this will ensure that this task is redone when the versions change.
     inputs.property "version", project.version
     inputs.property "mcversion", project.minecraft.version
