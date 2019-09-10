@@ -6,10 +6,10 @@ before_install:
   - chmod +x gradlew
 
 install:
-  - ./gradlew setupCiWorkspace
+  - ./gradlew setupCiWorkspace --info -S
 
 script:
-  - ./gradlew build
+  - ./gradlew build --info -S
 
 deploy:
   provider: releases
