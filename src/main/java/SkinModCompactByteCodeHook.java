@@ -49,8 +49,7 @@ public class SkinModCompactByteCodeHook {
             public void run() {
                 try {
                     SkinModCompactByteCodeHook.lockMap.get(gameProfile.getName()).lock();
-                    Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = new HashMap<>();
-                    map.putAll(CustomSkinLoader.loadProfile(gameProfile));
+                    Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = new HashMap<>(CustomSkinLoader.loadProfile(gameProfile));
                     MinecraftUtils.addScheduledTask(new SkinModCompactByteCodeHook.LoadSkinRunnable(gameProfile, map));
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -179,12 +178,15 @@ public class SkinModCompactByteCodeHook {
     public static void mix(UserProfile profile1, UserProfile profile2, GameProfile gameProfile) {
         UserProfile oldProfile = UserProfileUtils.clone(profile1);
         profile1.mix(profile2);
-        if (!Thread.currentThread().getName().equals(gameProfile.getName() + "'s skull") && !UserProfileUtils.isEquals(oldProfile, profile1)) {
+        boolean isSkull = Thread.currentThread().getName().equals(gameProfile.getName() + "'s skull");
+        if (!isSkull && !UserProfileUtils.isEquals(oldProfile, profile1)) {
             Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = ModelManager0.fromUserProfile(profile1);
             if (!CustomSkinLoader.config.enableCape) {
                 map.remove(MinecraftProfileTexture.Type.CAPE);
             }
             MinecraftUtils.addScheduledTask(new SkinModCompactByteCodeHook.LoadSkinRunnable(gameProfile, map));
+        } else if (isSkull && profile1.hasSkinUrl() && !UserProfileUtils.hasCapeUrl(profile1)) {
+            profile1.capeUrl = "http://example.com/";
         }
     }
     
