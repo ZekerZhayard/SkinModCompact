@@ -20,9 +20,9 @@ plugins {
     id "net.minecraftforge.gradle.forge" version "2.0.2"
 }
 */
-version = "5.0-RC-" + System.getenv("TRAVIS_BUILD_NUMBER")
+version = "5.1-RC-" + System.getenv("TRAVIS_BUILD_NUMBER")
 group = "io.github.zekerzhayard" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "SkinModCompact-ST-CSL-14.11-r"
+archivesBaseName = "SkinModCompact-ST-CSL-14.12-s96"
 
 sourceCompatibility = targetCompatibility = '1.7' // Need this here so eclipse task generates correctly.
 compileJava {

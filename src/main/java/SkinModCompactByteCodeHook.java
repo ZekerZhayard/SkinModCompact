@@ -178,16 +178,17 @@ public class SkinModCompactByteCodeHook {
     public static void mix(UserProfile profile1, UserProfile profile2, GameProfile gameProfile) {
         UserProfile oldProfile = UserProfileUtils.clone(profile1);
         profile1.mix(profile2);
-        boolean isSkull = Thread.currentThread().getName().equals(gameProfile.getName() + "'s skull");
-        if (!isSkull && !UserProfileUtils.isEquals(oldProfile, profile1)) {
+        if (!Thread.currentThread().getName().equals(gameProfile.getName() + "'s skull") && !UserProfileUtils.isEquals(oldProfile, profile1)) {
             Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = ModelManager0.fromUserProfile(profile1);
             if (!CustomSkinLoader.config.enableCape) {
                 map.remove(MinecraftProfileTexture.Type.CAPE);
             }
             MinecraftUtils.addScheduledTask(new SkinModCompactByteCodeHook.LoadSkinRunnable(gameProfile, map));
-        } else if (isSkull && profile1.hasSkinUrl() && !UserProfileUtils.hasCapeUrl(profile1)) {
-            profile1.capeUrl = "http://example.com/";
         }
+    }
+
+    public static boolean isFull(UserProfile profile, GameProfile gameProfile) {
+        return profile.isFull() || (Thread.currentThread().getName().equals(gameProfile.getName() + "'s skull") && profile.hasSkinUrl());
     }
     
     public static void loadSkull(final Thread thread, final GameProfile gameProfile) {

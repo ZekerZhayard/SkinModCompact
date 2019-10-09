@@ -91,7 +91,7 @@ public class NeteaseAPILoader implements ProfileLoader.IProfileLoader {
     }
 
     @Override()
-    public void initLocalFolder(SkinSiteProfile ssp) {
+    public void init(SkinSiteProfile ssp) {
 
     }
 
