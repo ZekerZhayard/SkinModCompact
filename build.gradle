@@ -7,12 +7,18 @@ buildscript {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
         }
+        maven {
+            name = "sponge"
+            url = "https://repo.spongepowered.org/maven"
+        }
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.0-SNAPSHOT'
+        classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
     }
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'org.spongepowered.mixin'
 
 /*
 // for people who want stable - not yet functional for MC 1.8.8 - we require the forgegradle 2.1 snapshot
@@ -20,17 +26,13 @@ plugins {
     id "net.minecraftforge.gradle.forge" version "2.0.2"
 }
 */
-version = "5.1-RC-" + System.getenv("TRAVIS_BUILD_NUMBER")
+version = "6.0-RC-" + System.getenv("TRAVIS_BUILD_NUMBER")
 group = "io.github.zekerzhayard" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "SkinModCompact-ST-CSL-14.12-s96"
+archivesBaseName = "SkinModCompact-ST-CSL-14.12-s107"
 
 sourceCompatibility = targetCompatibility = '1.7' // Need this here so eclipse task generates correctly.
 compileJava {
     sourceCompatibility = targetCompatibility = '1.7'
-}
-
-jar {
-    manifest.attributes 'FMLCorePlugin': 'io.github.zekerzhayard.skinmodcompact.asm.FMLLoadingPlugin'
 }
 
 minecraft {
@@ -45,6 +47,13 @@ minecraft {
     mappings = "stable_18"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
     replace "@VERSION@", project.version
+}
+
+repositories {
+    maven {
+        name = "sponge"
+        url = "https://repo.spongepowered.org/maven"
+    }
 }
 
 dependencies {
@@ -68,7 +77,32 @@ dependencies {
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+    provided('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
+        transitive = false
+    }
+}
 
+jar {
+    from configurations.provided.asFileTree.files.collect {
+        zipTree(it)
+    }
+
+    manifest.attributes([
+            "TweakClass": "io.github.zekerzhayard.skinmodcompact.asm.Tweaker",
+            "TweakOrder": 1,
+            "FMLAT": "skinmodcompact_at.cfg",
+            "Name": "SkinModCompact",
+            "Specification-Title": "SkinModCompact",
+            "Specification-Version": project.version,
+            "Specification-Vendor": "ZekerZhayard",
+            "Implementation-Title": "SkinModCompact",
+            "Implementation-Version": project.version,
+            "Implementation-Vendor": "ZekerZhayard"
+    ])
+}
+
+mixin {
+    add sourceSets.main, "mixins.skinmodcompact.refmap.json"
 }
 
 processResources {

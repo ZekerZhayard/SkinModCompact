@@ -1,0 +1,17 @@
+{
+  "compatibilityLevel": "JAVA_7",
+  "package": "io.github.zekerzhayard.skinmodcompact.asm.mixins",
+  "client": [
+    "MixinConfig",
+    "MixinCustomSkinLoader",
+    "MixinFakeSkinManager",
+    "MixinFakeSkinManager$1",
+    "MixinForgeMod",
+    "MixinGameProfile",
+    "MixinHttpRequestUtil",
+    "MixinSkinManager",
+    "MixinThreadDownloadImageData",
+    "MixinThreadDownloadImageData$1"
+  ],
+  "refmap": "mixins.skinmodcompact.refmap.json"
+}
