@@ -18,11 +18,7 @@ public class Tweaker implements ITweaker {
 
     @Override
     public void injectIntoClassLoader(LaunchClassLoader launchClassLoader) {
-        try {
-            FieldUtils.writeDeclaredField(Logger.Level.DEBUG, "display", true, true);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+
 
         MixinBootstrap.init();
         Mixins.addConfiguration("mixins.skinmodcompact.json");

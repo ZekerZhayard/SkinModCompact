@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
+import customskinloader.Logger;
 import net.minecraft.launchwrapper.Launch;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.spongepowered.asm.lib.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -12,7 +14,11 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 public class MixinConfigPlugin implements IMixinConfigPlugin {
     @Override
     public void onLoad(String mixinPackage) {
-
+        try {
+            FieldUtils.writeDeclaredField(Logger.Level.DEBUG, "display", true, true);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
