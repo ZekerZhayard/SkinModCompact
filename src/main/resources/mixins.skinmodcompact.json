@@ -13,5 +13,6 @@
     "MixinThreadDownloadImageData",
     "MixinThreadDownloadImageData$1"
   ],
-  "refmap": "mixins.skinmodcompact.refmap.json"
+  "refmap": "mixins.skinmodcompact.refmap.json",
+  "plugin": "io.github.zekerzhayard.skinmodcompact.asm.MixinConfigPlugin"
 }

@@ -89,8 +89,6 @@ jar {
 
     manifest.attributes([
             "TweakClass": "io.github.zekerzhayard.skinmodcompact.asm.Tweaker",
-            "TweakOrder": 1,
-            "FMLAT": "skinmodcompact_at.cfg",
             "Name": "SkinModCompact",
             "Specification-Title": "SkinModCompact",
             "Specification-Version": project.version,
@@ -103,6 +101,7 @@ jar {
 
 mixin {
     add sourceSets.main, "mixins.skinmodcompact.refmap.json"
+    reobfNotchSrgFile = "empty.srg"
 }
 
 processResources {

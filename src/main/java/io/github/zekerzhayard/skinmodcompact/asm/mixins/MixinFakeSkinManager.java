@@ -24,7 +24,8 @@ public abstract class MixinFakeSkinManager {
 
     @Inject(
         method = "Lcustomskinloader/fake/FakeSkinManager;<clinit>",
-        at = @At("TAIL")
+        at = @At("TAIL"),
+        require = 1
     )
     private static void inject$_clinit_$0(CallbackInfo ci) {
         THREAD_POOL = Executors.newCachedThreadPool();
