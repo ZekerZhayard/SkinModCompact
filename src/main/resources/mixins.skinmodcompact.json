@@ -5,11 +5,9 @@
     "MixinConfig",
     "MixinCustomSkinLoader",
     "MixinFakeSkinManager",
-    "MixinFakeSkinManager$1",
     "MixinForgeMod",
     "MixinGameProfile",
     "MixinHttpRequestUtil",
-    "MixinSkinManager",
     "MixinThreadDownloadImageData",
     "MixinThreadDownloadImageData$1"
   ],
