@@ -10,7 +10,7 @@ import java.net.URLConnection;
 import customskinloader.CustomSkinLoader;
 import customskinloader.utils.HttpRequestUtil;
 import io.github.zekerzhayard.skinmodcompact.config.ModConfig;
-import net.minecraft.client.Minecraft;
+import io.github.zekerzhayard.skinmodcompact.utils.MinecraftUtils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -49,7 +49,7 @@ public abstract class MixinHttpRequestUtil {
         require = 1
     )
     private static URLConnection redirect$makeHttpRequest$0(URL url) throws IOException {
-        return url.openConnection(Minecraft.getMinecraft().getProxy());
+        return url.openConnection(MinecraftUtils.getProxy());
     }
 
     @Redirect(

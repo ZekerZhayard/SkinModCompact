@@ -3,7 +3,9 @@ package io.github.zekerzhayard.skinmodcompact.asm.mixins;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import customskinloader.Logger;
 import customskinloader.fake.FakeSkinManager;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -29,5 +31,10 @@ public abstract class MixinFakeSkinManager {
     )
     private static void inject$_clinit_$0(CallbackInfo ci) {
         THREAD_POOL = Executors.newCachedThreadPool();
+        try {
+            FieldUtils.writeDeclaredField(Logger.Level.DEBUG, "display", true, true);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 }

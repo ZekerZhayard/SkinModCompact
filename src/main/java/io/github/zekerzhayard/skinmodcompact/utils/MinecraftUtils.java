@@ -1,5 +1,7 @@
 package io.github.zekerzhayard.skinmodcompact.utils;
 
+import java.net.Proxy;
+
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import net.minecraft.client.Minecraft;
@@ -17,5 +19,9 @@ public class MinecraftUtils {
 
     public static String getPlayerUUID(GameProfile profile) {
         return EntityPlayer.getUUID(profile).toString();
+    }
+
+    public static Proxy getProxy() {
+        return Minecraft.getMinecraft().getProxy();
     }
 }

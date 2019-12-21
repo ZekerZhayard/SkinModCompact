@@ -29,9 +29,7 @@ public abstract class MixinCustomSkinLoader {
         require = 1
     )
     private static void redirect$loadProfile0$0(UserProfile profile1, UserProfile profile2, GameProfile gameProfile) {
-        UserProfile oldProfile = UserProfileUtils.clone(profile1);
-        profile1.mix(profile2);
-        if (!((IMixinGameProfile) gameProfile).isSkull() && !UserProfileUtils.isEquals(oldProfile, profile1)) {
+        if (UserProfileUtils.mix(profile1, profile2) && !((IMixinGameProfile) gameProfile).isSkull()) {
             Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = ModelManager0.fromUserProfile(profile1);
             if (!CustomSkinLoader.config.enableCape) {
                 map.remove(MinecraftProfileTexture.Type.CAPE);
