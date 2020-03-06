@@ -26,13 +26,13 @@ plugins {
     id "net.minecraftforge.gradle.forge" version "2.0.2"
 }
 */
-version = "6.0-RC-" + System.getenv("TRAVIS_BUILD_NUMBER")
+version = "6.1-RC-" + System.getenv("TRAVIS_BUILD_NUMBER")
 group = "io.github.zekerzhayard" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "SkinModCompact-ST-CSL-14.12-s107"
+archivesBaseName = "SkinModCompact-ST-CSL-14.12-s111"
 
-sourceCompatibility = targetCompatibility = '1.7' // Need this here so eclipse task generates correctly.
+sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 compileJava {
-    sourceCompatibility = targetCompatibility = '1.7'
+    sourceCompatibility = targetCompatibility = '1.8'
 }
 
 minecraft {
@@ -53,6 +53,9 @@ repositories {
     maven {
         name = "sponge"
         url = "https://repo.spongepowered.org/maven"
+    }
+    maven {
+        url = "https://csl.littleservice.cn/libraries"
     }
 }
 
@@ -77,18 +80,18 @@ dependencies {
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-    provided('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
+    implementation('org.spongepowered:mixin:+') {
         transitive = false
     }
+
+    implementation 'customskinloader:CustomSkinLoader_1.14.4:14.12-SNAPSHOT-111'
 }
 
 jar {
-    from configurations.provided.asFileTree.files.collect {
-        zipTree(it)
-    }
-
     manifest.attributes([
             "TweakClass": "io.github.zekerzhayard.skinmodcompact.asm.Tweaker",
+            "MixinConnector": "io.github.zekerzhayard.skinmodcompact.asm.MixinConnector",
+            "FMLAT": "skinmodcompact_at.cfg",
             "Name": "SkinModCompact",
             "Specification-Title": "SkinModCompact",
             "Specification-Version": project.version,
@@ -97,6 +100,8 @@ jar {
             "Implementation-Version": project.version,
             "Implementation-Vendor": "ZekerZhayard"
     ])
+
+    exclude "com/**", "net/**"
 }
 
 mixin {

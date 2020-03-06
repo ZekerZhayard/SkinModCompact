@@ -5,10 +5,8 @@
     "MixinConfig",
     "MixinCustomSkinLoader",
     "MixinFakeSkinManager",
-    "MixinForgeMod",
     "MixinGameProfile",
     "MixinHttpRequestUtil",
-    "MixinThreadDownloadImageData",
     "MixinThreadDownloadImageData$1"
   ],
   "refmap": "mixins.skinmodcompact.refmap.json",

@@ -18,4 +18,4 @@ deploy:
   file:
     - build/libs/*
   skip_cleanup: true
-  name: "6.0-RC-${TRAVIS_BUILD_NUMBER}"
+  name: "6.1-RC-${TRAVIS_BUILD_NUMBER}"

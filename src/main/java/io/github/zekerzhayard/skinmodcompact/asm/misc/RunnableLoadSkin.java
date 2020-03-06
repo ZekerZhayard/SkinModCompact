@@ -1,4 +1,4 @@
-package io.github.zekerzhayard.skinmodcompact.asm.mixins.misc;
+package io.github.zekerzhayard.skinmodcompact.asm.misc;
 
 import java.util.Map;
 

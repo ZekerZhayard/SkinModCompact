@@ -1,7 +1,7 @@
 package io.github.zekerzhayard.skinmodcompact.asm.mixins;
 
 import customskinloader.config.Config;
-import io.github.zekerzhayard.skinmodcompact.asm.mixins.misc.ThreadCleanCache;
+import io.github.zekerzhayard.skinmodcompact.asm.misc.ThreadCleanCache;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;

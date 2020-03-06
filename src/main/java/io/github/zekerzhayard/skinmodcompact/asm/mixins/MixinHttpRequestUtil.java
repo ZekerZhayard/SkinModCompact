@@ -62,7 +62,7 @@ public abstract class MixinHttpRequestUtil {
         require = 1
     )
     private static HttpRequestUtil.HttpResponce redirect$makeHttpRequest$1(HttpRequestUtil.HttpRequest $request, HttpRequestUtil.HttpResponce responce, HttpRequestUtil.HttpRequest request, int redirectTime) throws InterruptedException {
-        CustomSkinLoader.logger.debug("[SkinModCompact] Retry to make request.");
+        CustomSkinLoader.logger.debug("[SkinModCompact] Retry to make request. (" + request.url + ")");
         Thread.sleep(ModConfig.retryTime);
         return makeHttpRequest(request, redirectTime);
     }

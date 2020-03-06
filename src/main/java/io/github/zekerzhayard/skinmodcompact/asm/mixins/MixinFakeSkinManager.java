@@ -8,7 +8,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import customskinloader.Logger;
 import customskinloader.fake.FakeSkinManager;
-import io.github.zekerzhayard.skinmodcompact.asm.mixins.misc.IMixinGameProfile;
+import io.github.zekerzhayard.skinmodcompact.asm.misc.IMixinGameProfile;
 import net.minecraft.client.resources.SkinManager;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.spongepowered.asm.mixin.Final;

@@ -1,7 +1,7 @@
 package io.github.zekerzhayard.skinmodcompact.asm.mixins;
 
 import com.mojang.authlib.GameProfile;
-import io.github.zekerzhayard.skinmodcompact.asm.mixins.misc.IMixinGameProfile;
+import io.github.zekerzhayard.skinmodcompact.asm.misc.IMixinGameProfile;
 import net.minecraft.client.resources.SkinManager;
 import org.spongepowered.asm.mixin.Mixin;
 

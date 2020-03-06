@@ -4,8 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
-import net.minecraft.launchwrapper.Launch;
-import org.spongepowered.asm.lib.tree.ClassNode;
+import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
@@ -33,12 +32,13 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
     @Override
     public List<String> getMixins() {
         try {
-            Class.forName("optifine.OptiFineForgeTweaker", false, Launch.classLoader);
+            Class.forName("optifine.OptiFineForgeTweaker", false, this.getClass().getClassLoader());
             return Lists.newArrayList("MixinThreadDownloadImageData_OptiFine");
         } catch (ClassNotFoundException e) {
             return null;
         }
     }
+
 
     @Override
     public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
@@ -50,13 +50,11 @@ public class MixinConfigPlugin implements IMixinConfigPlugin {
 
     }
 
-    // Compatible with Mixin 0.8
-    public void preApply(String targetClassName, org.objectweb.asm.tree.ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+    public void preApply(String targetClassName, org.spongepowered.asm.lib.tree.ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
 
     }
 
-    // Compatible with Mixin 0.8
-    public void postApply(String targetClassName, org.objectweb.asm.tree.ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+    public void postApply(String targetClassName, org.spongepowered.asm.lib.tree.ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
 
     }
 }
